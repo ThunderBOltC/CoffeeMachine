@@ -8,6 +8,10 @@ from loading import load
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
     
+def home():
+    print("1. Order Coffee")
+    print("2. Resource Report ")
+    print("3. Turn off machine ")
     
 def show_report():
     print(metadata.resources)
@@ -78,7 +82,6 @@ def change_calcu(taka: int):
         taka-=5
         note_5+=1
         
-    #notes=[note_100,note_50,note_20,note_10,note_5]
     if note_5*5+note_10*10+note_20*20+note_50*50+note_100*100 ==total:
         notes=[note_100,note_50,note_20,note_10,note_5]
         return notes
@@ -138,64 +141,67 @@ machine_status= "ON"
 while machine_status=="ON":
     clear_terminal()
     art.show_art()
-    coffee= input("What would you like? (espresso/latte/cappuccino):").lower()
-    if coffee=="off":
+    home()
+    choice= input("Choice: ")
+    if choice=="1":
+        coffee= input("What would you like? (espresso/latte/cappuccino):").lower()
+
+        if not is_sufficient(coffee):
+            print("Sorry there is no enough resources in the machine!!!!!!\nTRY AGAIN LATER")
+            time.sleep(7)
+            continue
+        price = metadata.MENU[coffee]["cost"]
+        print(f"\nthe {coffee} will cost {price} taka\n")
+        
+        pay=input("do you want to make payment(y/n): ").upper()
+        bills=None
+        
+        if pay=="Y":
+            bills=input_notes()
+        else:
+            print("\norder failed\nTRY AGAIN")
+            time.sleep(7)
+            continue
+        
+        if is_money_enough(bills,coffee)==True:
+            change= total_money(bills)-price
+            
+            if change >0:
+                notes= change_calcu(change)
+                if len(notes)==0:
+                    print("\nnot enough bills for the changes. MONEY REFUNDED")
+                    time.sleep(5)
+                    continue
+                else:
+                    clear_terminal()
+                    art.show_art()
+                    print("\nHere is your change")
+                    print(f"100 tk notes : {notes[0]}")
+                    print(f"50 tk notes : {notes[1]}")
+                    print(f"20 tk notes : {notes[2]}")
+                    print(f"10 tk notes : {notes[3]}")
+                    print(f"5 tk notes : {notes[4]}")
+        
+            make_coffee(coffee)
+            serve_coffee(coffee)
+            time.sleep(5)
+            
+    elif choice=="2":
+        show_report()
+        time.sleep(11)
+        continue
+    
+    else:
         machine_status="OFF"
         clear_terminal()
         art.show_art()
         print("turning off the machine in ")
+        
         for x in range(3):
             print(f"\r{3-x}",end="",flush=True)
             time.sleep(1)
+            
         clear_terminal()
         art.bye()
         continue
-    if coffee=="report":
-        show_report()
-        time.sleep(7)
-        continue
-    if not is_sufficient(coffee):
-        print("Sorry there is no enough resources in the machine!!!!!!\nTRY AGAIN LATER")
-        time.sleep(7)
-        continue
-    price = metadata.MENU[coffee]["cost"]
-    print(f"\nthe {coffee} will cost {price} taka\n")
-    
-    pay=input("do you want to make payment(y/n): ").upper()
-    bills=None
-    
-    if pay=="Y":
-        bills=input_notes()
-    else:
-        print("\norder failed\nTRY AGAIN")
-        time.sleep(7)
-        continue
-    
-    if is_money_enough(bills,coffee)==True:
-        change= total_money(bills)-price
-        
-        if change >0:
-            notes= change_calcu(change)
-            if len(notes)==0:
-                print("\nnot enough bills for the changes. MONEY REFUNDED")
-                time.sleep(5)
-                continue
-            else:
-                clear_terminal()
-                art.show_art()
-                print("\nHere is your change")
-                print(f"100 tk notes : {notes[0]}")
-                print(f"50 tk notes : {notes[1]}")
-                print(f"20 tk notes : {notes[2]}")
-                print(f"10 tk notes : {notes[3]}")
-                print(f"5 tk notes : {notes[4]}")
-       
-        make_coffee(coffee)
-        serve_coffee(coffee)
-        print("\n\n##### To turn off the machine enter off######")
-        time.sleep(5)
-        
-    
-    
-    
     
